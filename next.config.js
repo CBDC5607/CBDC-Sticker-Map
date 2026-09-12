@@ -9,7 +9,7 @@ const nextConfig = {
         headers: [
           {
             key: 'Content-Security-Policy',
-            value: "frame-ancestors 'self' https://coffinbaydesignco.com.au https://www.coffinbaydesignco.com.au https://*.squarespace.com",
+            value: "frame-ancestors 'self' https://coffinbaydesignco.com https://www.coffinbaydesignco.com https://*.squarespace.com",
           },
         ],
       },
