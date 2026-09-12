@@ -48,15 +48,6 @@ export default function MapView() {
     setCount(Object.keys(markersRef.current).length);
   }, []);
 
-  const removeMarker = useCallback((id) => {
-    const marker = markersRef.current[id];
-    if (marker) {
-      marker.remove();
-      delete markersRef.current[id];
-      setCount(Object.keys(markersRef.current).length);
-    }
-  }, []);
-
   useEffect(() => {
     if (mapRef.current) return;
 
@@ -157,15 +148,7 @@ export default function MapView() {
       )}
 
       {activeSticker && (
-        <Lightbox
-          sticker={activeSticker}
-          onClose={() => setActiveSticker(null)}
-          onDeleted={(id) => {
-            removeMarker(id);
-            setStickers((prev) => prev.filter((s) => s.id !== id));
-          }}
-          onToast={showToast}
-        />
+        <Lightbox sticker={activeSticker} onClose={() => setActiveSticker(null)} />
       )}
 
       <div className={`cbdc-toast${toastVisible ? ' show' : ''}`}>{toastMsg}</div>

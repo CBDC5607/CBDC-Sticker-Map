@@ -1,11 +1,6 @@
 'use client';
 
-import { useState } from 'react';
-import { supabase } from '../lib/supabaseClient';
-
-export default function Lightbox({ sticker, onClose, onDeleted, onToast }) {
-  const [deleting, setDeleting] = useState(false);
-
+export default function Lightbox({ sticker, onClose }) {
   let dateStr = '';
   try {
     dateStr = new Date(sticker.created_at).toLocaleDateString(undefined, {
@@ -15,33 +10,6 @@ export default function Lightbox({ sticker, onClose, onDeleted, onToast }) {
     });
   } catch (e) {
     /* ignore */
-  }
-
-  async function handleDelete() {
-    setDeleting(true);
-    try {
-      const { error: deleteRowError } = await supabase
-        .from('stickers')
-        .delete()
-        .eq('id', sticker.id);
-      if (deleteRowError) throw deleteRowError;
-
-      if (sticker.storage_path) {
-        // Best-effort — an orphaned file isn't worth failing the whole action over.
-        await supabase.storage.from('sticker-photos').remove([sticker.storage_path]);
-      }
-
-      onDeleted(sticker.id);
-      onToast('Sighting removed.');
-      onClose();
-    } catch (err) {
-      console.error('Delete failed', err);
-      onToast(
-        'Could not remove that pin. If public deletion is disabled in Supabase, ' +
-          'that\'s expected — see the README.'
-      );
-      setDeleting(false);
-    }
   }
 
   return (
@@ -57,6 +25,7 @@ export default function Lightbox({ sticker, onClose, onDeleted, onToast }) {
           <img className="cbdc-lightbox-img" src={sticker.image_url} alt="Sticker sighting photo" />
         </div>
         <div className="cbdc-card-body">
+          {sticker.name && <div className="cbdc-lightbox-caption">{sticker.name}</div>}
           {sticker.caption && <div className="cbdc-lightbox-caption">{sticker.caption}</div>}
           <div className="cbdc-lightbox-meta">
             {sticker.lat.toFixed(5)}, {sticker.lng.toFixed(5)}
@@ -65,9 +34,6 @@ export default function Lightbox({ sticker, onClose, onDeleted, onToast }) {
           <div className="cbdc-btn-row">
             <button className="cbdc-btn cbdc-btn-ghost" onClick={onClose}>
               Close
-            </button>
-            <button className="cbdc-btn cbdc-btn-danger" disabled={deleting} onClick={handleDelete}>
-              {deleting ? 'Removing…' : 'Remove pin'}
             </button>
           </div>
         </div>
